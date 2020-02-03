@@ -6,7 +6,9 @@ import io.swagger.annotations.ApiParam;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -15,21 +17,18 @@ import javax.validation.constraints.NotNull;
 public class TransactionRequest {
 
     @NotNull
-    @NotBlank
-    @ApiParam(name = "Unique transaction id")
-    private String transactionId;
-
-    @NotNull
     @ApiParam(name = "Unique transaction id", allowableValues = "credit|debit")
     private TransactionType transactionType;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Account Number can not be null")
+    @NotBlank(message = "Account Number can not be blank")
+    @NotEmpty(message = "Account Number can not be empty")
     @ApiParam(name = "Unique account number")
     private String accountNumber;
 
     @NotNull
     @ApiParam(name = "Money contains money and currency")
+    @Valid
     private Money money;
 
 

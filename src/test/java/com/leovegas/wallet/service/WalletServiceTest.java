@@ -22,7 +22,6 @@ import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Currency;
 import java.util.Date;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,13 +47,12 @@ public class WalletServiceTest {
         CreateAccountRequest createAccountRequest = CreateAccountRequest.builder()
                 .accountStatus(true)
                 .money(getMoney("100"))
-                .accountNumber(accountNumber)
                 .build();
 
         Mockito.when(accountRepository.save(any(AccountEntity.class))).thenReturn(getAccountEntity(accountNumber, "100"));
 
 
-        Mono<CreateAccountResponse> createAccountResponse = walletService.createAccount(createAccountRequest);
+        Mono<CreateAccountResponse> createAccountResponse = walletService.createAccount(createAccountRequest, accountNumber);
 
         StepVerifier.create(createAccountResponse)
                 .expectNext(CreateAccountResponse.builder()
@@ -86,7 +84,7 @@ public class WalletServiceTest {
     private Money getMoney(String s) {
         return Money.builder()
                 .amount(new BigDecimal(s))
-                .currency(Currency.getInstance("SEK"))
+                .currencyCode("SEK")
                 .build();
     }
 
@@ -94,6 +92,7 @@ public class WalletServiceTest {
     public void test_transfer_fund_expect_data() {
 
         String accountNumber = "account1";
+        String transactionId = "test";
 
         Mockito.when(accountRepository.findByAccountNumber(accountNumber)).thenReturn(getAccountEntity(accountNumber, "100.00"));
 
@@ -104,11 +103,10 @@ public class WalletServiceTest {
         Mockito.when(transactionRepository.save(any(TransactionEntity.class))).thenReturn(transactionEntity);
 
         Mono<TransactionResponse> transactionResponse = walletService.transferFunds(TransactionRequest.builder()
-                .transactionId("test")
                 .transactionType(TransactionType.CREDIT)
                 .accountNumber(accountNumber)
                 .money(getMoney("100.00"))
-                .build());
+                .build(), transactionId);
 
         StepVerifier.create(transactionResponse)
                 .expectNext(getTransactionResponse(accountNumber, transactionDate, "100.00"))

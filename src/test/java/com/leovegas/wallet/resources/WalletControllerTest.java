@@ -13,7 +13,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.UUID;
 
 @RunWith(SpringRunner.class)
@@ -35,13 +34,12 @@ public class WalletControllerTest {
 
     private WebTestClient.RequestHeadersSpec<?> createAccount(String accountNumber) {
         return webTestClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/wallet/accounts")
-                        .build())
+                .uri(uriBuilder -> uriBuilder.path("/wallet/accounts/{accountNumber}")
+                        .build(accountNumber))
                 .bodyValue(CreateAccountRequest.builder()
-                        .accountNumber(accountNumber)
                         .accountStatus(true)
                         .money(Money.builder()
-                                .currency(Currency.getInstance("SEK"))
+                                .currencyCode("SEK")
                                 .amount(new BigDecimal("100.00"))
                                 .build())
                         .build());
@@ -121,14 +119,13 @@ public class WalletControllerTest {
     private WebTestClient.RequestHeadersSpec<?> createTransaction(String accountNumber, TransactionType transactionType,
                                                                   String amount, String currency) {
         return webTestClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/wallet/transactions")
-                        .build())
+                .uri(uriBuilder -> uriBuilder.path("/wallet/transactions/{transactionId}")
+                        .build(UUID.randomUUID().toString()))
                 .bodyValue(TransactionRequest.builder()
                         .accountNumber(accountNumber)
                         .transactionType(transactionType)
-                        .transactionId(UUID.randomUUID().toString())
                         .money(Money.builder()
-                                .currency(Currency.getInstance(currency))
+                                .currencyCode(currency)
                                 .amount(new BigDecimal(amount))
                                 .build())
                         .build());
@@ -193,13 +190,12 @@ public class WalletControllerTest {
         String accountNumber = "account8";
 
         webTestClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/wallet/accounts")
-                        .build())
+                .uri(uriBuilder -> uriBuilder.path("/wallet/accounts/{accountNumber}")
+                        .build(accountNumber))
                 .bodyValue(CreateAccountRequest.builder()
-                        .accountNumber(accountNumber)
                         .accountStatus(false)
                         .money(Money.builder()
-                                .currency(Currency.getInstance("SEK"))
+                                .currencyCode("SEK")
                                 .amount(new BigDecimal("100.00"))
                                 .build())
                         .build())
@@ -268,7 +264,7 @@ public class WalletControllerTest {
     }
 
     @Test
-    public void test_get_transaction_by_transaction_reference_request_expect_success() {
+    public void test_get_transaction_by_id_request_expect_success() {
         String accountNumber = "account12";
         String transactionRef = UUID.randomUUID().toString();
 
@@ -277,14 +273,13 @@ public class WalletControllerTest {
                 .expectStatus().isOk();
 
         webTestClient.post()
-                .uri(uriBuilder -> uriBuilder.path("/wallet/transactions")
-                        .build())
+                .uri(uriBuilder -> uriBuilder.path("/wallet/transactions/{transactionRef}")
+                        .build(transactionRef))
                 .bodyValue(TransactionRequest.builder()
                         .accountNumber(accountNumber)
                         .transactionType(TransactionType.CREDIT)
-                        .transactionId(transactionRef)
                         .money(Money.builder()
-                                .currency(Currency.getInstance("SEK"))
+                                .currencyCode("SEK")
                                 .amount(new BigDecimal("150"))
                                 .build())
                         .build())
@@ -305,7 +300,7 @@ public class WalletControllerTest {
     }
 
     @Test
-    public void test_get_transaction_by_transaction_reference_request_expect_transaction_not_found_exception() {
+    public void test_get_transaction_by_id_request_expect_transaction_not_found_exception() {
         String transactionRef = UUID.randomUUID().toString();
 
         webTestClient.get()

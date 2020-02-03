@@ -17,7 +17,7 @@ public class CurrencyUtils {
 
         return Money.builder()
                 .amount(left.getAmount().add(right.getAmount()))
-                .currency(left.getCurrency())
+                .currencyCode(left.getCurrencyCode())
                 .build();
     }
 
@@ -26,20 +26,24 @@ public class CurrencyUtils {
         BigDecimal decimal = new BigDecimal(value);
         Currency currency = Currency.getInstance(currencyCode);
         if (decimal.scale() != currency.getDefaultFractionDigits()) {
-            throw new IllegalArgumentException("Wrong number of fraction digits for currency : "
-                    + decimal.scale()
-                    + " != " + currency.getDefaultFractionDigits() + " for: " + value);
+            throw new IllegalArgumentException(
+                    String.format("Wrong number of fraction digits for currency : %s  != %s for: %s",
+                            decimal.scale(),
+                            currency.getDefaultFractionDigits(),
+                            value
+                    ));
         }
         return Money.builder()
                 .amount(decimal)
-                .currency(currency)
+                .currencyCode(currency.getCurrencyCode())
                 .build();
     }
 
     private static void checkSameCurrency(Money left, Money right) {
-        if (!left.getCurrency().equals(right.getCurrency())) {
+        if (!left.getCurrencyCode().equals(right.getCurrencyCode())) {
             throw new CurrencyMismatchException(
-                    left.getCurrency() + " doesn't match the expected currency: " + right.getCurrency());
+                    String.format(
+                            "%s doesn't match the expected currency: %s", left.getCurrencyCode(), right.getCurrencyCode()));
         }
     }
 

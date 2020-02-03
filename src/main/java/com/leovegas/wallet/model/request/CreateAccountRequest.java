@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -17,16 +17,12 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class CreateAccountRequest {
 
-    @NotNull
-    @NotBlank
-    @ApiParam(name = "Account number")
-    private String accountNumber;
-
-    @NotNull
+    @NotNull(message = "Account Status can not be null")
     @ApiParam(name = "Account status")
     private Boolean accountStatus;
 
     @NotNull
     @ApiParam(name = "Money contains money and currency")
+    @Valid
     private Money money;
 }

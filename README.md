@@ -33,4 +33,5 @@ $ java -jar wallet-service-1.0.0-SNAPSHOT.jar
 
 ## Exposed endpoints
 
-The application currently exposes its API specification in <http://localhost:8082/swagger-ui.html> or <http://localhost:8082/v2/api-docs> if you prefer the API JSON model.
+- The application currently exposes its API specification in <http://localhost:8082/swagger-ui.html> or <http://localhost:8082/v2/api-docs> if you prefer the API JSON model.
+- Metrics can be found http://localhost:8082/actuator/prometheus
